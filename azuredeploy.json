@@ -1,0 +1,386 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "serverName": {
+      "type": "String",
+      "defaultValue": "dinrhel",
+      "metadata": {
+        "description": "The name of the server."
+      }
+    },
+    "aad": {
+      "type": "String",
+      "defaultValue": "f0e3b718-fb05-46a2-9f99-d2beebe72f2b",
+      "metadata": {
+        "description": "The name of the server."
+      }
+    },
+    "secret": {
+      "type": "String",
+      "defaultValue": "Cloud2016",
+      "metadata": {
+        "description": "The name of the server."
+      }
+    },
+    "serverSize": {
+      "defaultValue": "Standard_D4",
+      "type": "String",
+      "metadata": {
+        "description": "The size of the server."
+      }
+    },
+    "numDataDisks": {
+      "allowedValues": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "type": "String",
+      "defaultValue": "2",
+      "metadata": {
+        "description": "The number of data disks."
+      }
+    },
+    "dataDiskSizeGB": {
+      "type": "Int",
+      "defaultValue": 50,
+      "metadata": {
+        "description": "The size of the data disks in GB."
+      }
+    },
+    "availabilitySetName": {
+      "type": "String",
+      "defaultValue": "rhel",
+      "metadata": {
+        "description": "The name of the availability set in which this server is to be placed."
+      }
+    },
+    "availabilitySetId": {
+      "type": "String",
+      "defaultValue": "/subscriptions/928f4e7e-2c28-4063-a56e-6f1e6f2bb73c/resourceGroups/rheltest/providers/Microsoft.Compute/availabilitySets/rhel",
+      "metadata": {
+        "description": "The id of the availability set in which this server is to be placed."
+      }
+    },
+    "imagePublisher": {
+      "defaultValue": "RedHat",
+      "type": "String",
+      "metadata": {
+        "description": "The publisher of the image to deploy on the server."
+      }
+    },
+    "imageOffer": {
+      "defaultValue": "RHEL",
+      "type": "String",
+      "metadata": {
+        "description": "The offer of the image to deploy on the server."
+      }
+    },
+    "imageSKU": {
+      "defaultValue": "7.2",
+      "type": "String",
+      "metadata": {
+        "description": "The SKU of the image to deploy on the server.."
+      }
+    },
+    "imageVersion": {
+      "defaultValue": "latest",
+      "type": "String",
+      "metadata": {
+        "description": "The version number of the image to deploy on the server."
+      }
+    },
+    "adminUserName": {
+      "type": "String",
+      "defaultValue": "dinor",
+      "metadata": {
+        "description": "The name of the administrator account for the server. No domain prefix must be supplied."
+      }
+    },
+    "adminPassword": {
+      "type": "SecureString",
+      "defaultValue": "Corp123!!!!!",
+      "metadata": {
+        "description": "The password for the administrator account for the server."
+      }
+    },
+    "storageAccountName": {
+      "type": "String",
+      "defaultValue": "rheldinor",
+      "metadata": {
+        "description": "The name of the storage account where the disks are to be stored."
+      }
+    },
+    "storageAccountId": {
+      "type": "String",
+      "defaultValue": "/subscriptions/928f4e7e-2c28-4063-a56e-6f1e6f2bb73c/resourceGroups/rheltest/providers/Microsoft.Storage/storageAccounts/rheldinor",
+      "metadata": {
+        "description": "The resource Id for the storage account where the disks are to be stored."
+      }
+    },
+    "subnetId": {
+      "type": "String",
+      "defaultValue": "/subscriptions/928f4e7e-2c28-4063-a56e-6f1e6f2bb73c/resourceGroups/rheltest/providers/Microsoft.Network/virtualNetworks/rhelnet/subnets/default",
+      "metadata": {
+        "description": "The resource Id for the subnet to which the VM is to be attached. The calling template should depend on the vnet that contains the subnet."
+      }
+    },
+    "privateIPAllocationMethod": {
+      "defaultValue": "Dynamic",
+      "allowedValues": [
+        "Static",
+        "Dynamic"
+      ],
+      "type": "String",
+      "metadata": {
+        "description": "Defines how a private IP address is assigned. Options are Static or Dynamic."
+      }
+    },
+
+    "dnsSettings": {
+      "defaultValue": {
+        "dnsServers": [ ]
+      },
+      "type": "Object",
+      "metadata": {
+        "description": "The DNS settings to use, null to get them from the Vnet."
+      }
+    },
+
+    "diagStorageAccountName": {
+      "type": "String",
+      "defaultValue": "rheldinor",
+      "metadata": {
+        "description": "The name of the Diagnostic storage account."
+      }
+    },
+    "configKeyVaultResourceGroup": {
+      "defaultValue": "sql1",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the resource group containing the configuration key vault for the server type."
+      }
+    },
+    "configKeyVaultName": {
+      "defaultValue": "mykv1",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the key vault containing the secrets for the server type."
+      }
+    },
+    "encKeyVaultName": {
+      "defaultValue": "mykv1",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the key vault containing the encryption keys for the server type."
+      }
+    },
+    "encKeyVaultResourceGroup": {
+      "defaultValue": "sql1",
+      "type": "String",
+      "metadata": {
+        "description": "The encryption key vault resource group name."
+      }
+    },
+    "encKekUrl": {
+      "defaultValue": "https://mykv1.vault.azure.net/keys/keyencryptionkey/3dff907e65664ab692ef229468147e20",
+      "type": "String",
+      "metadata": {
+        "description": "The KEK url."
+      }
+    }
+  },
+  "variables": {
+    "serverId": "[resourceId('Microsoft.Compute/virtualMachines/', parameters('serverName'))]",
+    "serverNicName": "[concat(parameters('serverName'), '-pnic0')]",
+    "serverNicID": "[resourceId('Microsoft.Network/networkInterfaces/', variables('serverNicName'))]",
+
+
+
+
+    "serverOsDiskName": "[concat(parameters('serverName'), '-osdisk')]",
+    "vhdStorageAccountContainerName": "[concat(toLower(resourceGroup().name), '-vhd')]",
+    "diskSelectionTemplate": "https://raw.githubusercontent.com/digeler/full-encrypt-linked/master/diskselect.json",
+    "diskSelectionDeploymentName": "ff",
+    "diskSelectionTemplateId": "[resourceId('Microsoft.Resources/deployments/', variables('diskSelectionDeploymentName'))]",
+    "EncryptionTemplateName": "EncryptionTemplate",
+    "actualEncryptionTemplate": "https://raw.githubusercontent.com/digeler/full-encrypt-linked/master/encrypt.json"
+
+
+
+
+
+
+
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "[variables('diskSelectionDeploymentName')]",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('diskSelectionTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "numDataDisks": {
+            "value": "[parameters('numDataDisks')]"
+          },
+          "diskNameRoot": {
+            "value": "[parameters('serverName')]"
+          },
+          "diskStorageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "diskStorageAccountContainerName": {
+            "value": "[variables('vhdStorageAccountContainerName')]"
+          },
+          "diskCaching": {
+            "value": "ReadWrite"
+          },
+          "diskSizeGB": {
+            "value": "[parameters('dataDiskSizeGB')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('serverNicName')]",
+      "apiVersion": "2016-03-30",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "[parameters('privateIPAllocationMethod')]",
+              
+              "subnet": {
+                "id": "[parameters('subnetId')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": "[parameters('dnsSettings')]"
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('serverName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+
+      "properties": {
+        "availabilitySet": {
+          "id": "[parameters('availabilitySetId')]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('serverSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('serverName')]",
+          "adminUsername": "[parameters('adminUserName')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "[parameters('imageVersion')]"
+          },
+          "osDisk": {
+            "name": "[variables('serverOsDiskName')]",
+            "vhd": {
+              "uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/', variables('vhdStorageAccountContainerName'), '/', variables('serverOsDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": "[reference(variables('diskSelectionDeploymentName')).outputs.dataDiskArray.value]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('serverNicID')]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('http://', parameters('diagStorageAccountName'), '.blob.core.windows.net')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('serverNicID')]",
+        "[variables('diskSelectionTemplateId')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "[concat(parameters('serverName'),'-Encrypt')]",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[variables('serverId')]",
+        "[variables('serverNicID')]",
+        "[variables('diskSelectionTemplateId')]"
+      ],
+        "properties": {        
+        
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('actualEncryptionTemplate')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+
+
+
+            "vmName": {
+              "value": "[parameters('serverName')]"
+            },
+            "aadClientID": {
+
+              "value": "[parameters('aad')]"
+
+
+            },
+            "aadClientSecret": {
+              "value": "[parameters('secret')]"
+
+
+            },
+            "keyVaultName": {
+              "value": "[parameters('encKeyVaultName')]"
+            },
+            "keyVaultResourceGroup": {
+              "value": "[parameters('encKeyVaultResourceGroup')]"
+            },
+
+            "keyEncryptionKeyURL": {
+              "value": "[parameters('encKekUrl')]"
+            }
+
+
+
+          }
+        }
+
+    }
+
+  ]
+
+}
