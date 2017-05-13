@@ -27,7 +27,7 @@
       }
     },
     "serverSize": {
-      "defaultValue": "Standard_A1",
+      "defaultValue": "Standard_D4",
       "type": "String",
       "metadata": {
         "description": "The size of the server."
