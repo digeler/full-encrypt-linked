@@ -439,11 +439,8 @@
             "value": "[parameters('templateLocationSasToken')]"
           }
         }
-      },
-      "dependsOn": [
-        "[variables('serverId')]",
-        "[resourceId('Microsoft.Resources/deployments', concat(parameters('serverName'), '-linuxAgent'))]"
-      ]
+      }
+      
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -463,17 +460,9 @@
             "value": "[parameters('serverName')]"
           }
         }
-      },
-      "dependsOn": [
-        "[variables('serverId')]",
-        "[resourceId('Microsoft.Resources/deployments', concat(parameters('serverName'), '-Encrypt'))]"
-      ]
+      }
+     
     }
-  ],
-  "outputs": {
-    "ServerId": {
-      "type": "String",
-      "value": "[variables('serverId')]"
-    }
-  }
+  ]
+ 
 }
