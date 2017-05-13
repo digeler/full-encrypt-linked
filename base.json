@@ -68,28 +68,28 @@
       }
     },
     "imagePublisher": {
-      "defaultValue": "MicrosoftWindowsServer",
+      "defaultValue": "RedHat",
       "type": "String",
       "metadata": {
         "description": "The publisher of the image to deploy on the server."
       }
     },
     "imageOffer": {
-      "defaultValue": "WindowsServer",
+      "defaultValue": "RHEL",
       "type": "String",
       "metadata": {
         "description": "The offer of the image to deploy on the server."
       }
     },
     "imageSKU": {
-      "defaultValue": "2012-R2-Datacenter",
+      "defaultValue": "7.2",
       "type": "String",
       "metadata": {
         "description": "The SKU of the image to deploy on the server.."
       }
     },
     "imageVersion": {
-      "defaultValue": "7.2.20161026",
+      "defaultValue": "latest",
       "type": "String",
       "metadata": {
         "description": "The version number of the image to deploy on the server."
