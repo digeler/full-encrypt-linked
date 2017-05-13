@@ -1,0 +1,99 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "String",
+      "metadata": {
+        "description": "Name of the virtual machine"
+      }
+    },
+    "aadClientID": {
+      "type": "String",
+      "metadata": {
+        "description": "Client ID of AAD app which has permissions to KeyVault"
+      }
+    },
+    "aadClientSecret": {
+      "type": "SecureString",
+      "metadata": {
+        "description": "Client Secret of AAD app which has permissions to KeyVault"
+      }
+    },
+    "keyVaultName": {
+      "type": "String",
+      "metadata": {
+        "description": "Name of the KeyVault to place the volume encryption key"
+      }
+    },
+    "keyVaultResourceGroup": {
+      "type": "String",
+      "metadata": {
+        "description": "Resource group of the KeyVault"
+      }
+    },
+    "keyEncryptionKeyURL": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
+      }
+    },
+    "volumeType": {
+      "defaultValue": "All",
+      "allowedValues": [
+        "All",
+        "OS",
+        "Data"
+      ],
+      "type": "String",
+      "metadata": {
+        "description": "Type of the volume OS or Data to perform encryption operation"
+      }
+    }
+  },
+  "variables": {
+    "extensionName": "AzureDiskEncryptionForLinux",
+    "extensionVersion": "0.1",
+    "encryptionOperation": "EnableEncryption",
+    "keyEncryptionAlgorithm": "RSA-OAEP",
+    "updateVmTemplateName": "UpdateVmTemplate",
+    "updateVmUrl": "https://github.com/Azure/azure-quickstart-templates/blob/master/201-encrypt-running-linux-vm/updatevm-kek.json",
+    "keyVaultURL": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]",
+    "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',parameters('keyVaultResourceGroup'),'/providers/Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'),'/', variables('extensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Security",
+        "type": "AzureDiskEncryptionForLinux",
+        "typeHandlerVersion": "[variables('extensionVersion')]",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "AADClientID": "[parameters('aadClientID')]",
+          "KeyVaultURL": "[variables('keyVaultURL')]",
+          "KeyEncryptionKeyURL": "[parameters('keyEncryptionKeyURL')]",
+          "KeyEncryptionAlgorithm": "[variables('keyEncryptionAlgorithm')]",
+          "VolumeType": "[parameters('volumeType')]",
+          "EncryptionOperation": "[variables('encryptionOperation')]"
+          
+       
+        },
+        "protectedSettings": {
+          "AADClientSecret": "[parameters('aadClientSecret')]"
+          
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "BitLockerKey": {
+      "type": "String",
+      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',  parameters('vmName'), variables('extensionName'))).instanceView.statuses[0].message]"
+    }
+  }
+}
