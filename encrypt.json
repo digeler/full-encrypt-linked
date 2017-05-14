@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -33,7 +33,14 @@
       }
     },
     "keyEncryptionKeyURL": {
-      "defaultValue": "",
+      
+      "type": "String",
+      "metadata": {
+        "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
+      }
+    },
+    "SequenceVersion": {
+      
       "type": "String",
       "metadata": {
         "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
@@ -79,14 +86,14 @@
           "KeyEncryptionKeyURL": "[parameters('keyEncryptionKeyURL')]",
           "KeyEncryptionAlgorithm": "[variables('keyEncryptionAlgorithm')]",
           "VolumeType": "[parameters('volumeType')]",
-          "SequenceVersion": "[parameters('sequenceVersion')]",
+          "SequenceVersion": "[parameters('SequenceVersion')]",
           "EncryptionOperation": "[variables('encryptionOperation')]"
-          
-       
+
+
         },
         "protectedSettings": {
           "AADClientSecret": "[parameters('aadClientSecret')]"
-          
+
         }
       }
     }
