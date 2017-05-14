@@ -79,6 +79,7 @@
           "KeyEncryptionKeyURL": "[parameters('keyEncryptionKeyURL')]",
           "KeyEncryptionAlgorithm": "[variables('keyEncryptionAlgorithm')]",
           "VolumeType": "[parameters('volumeType')]",
+          "SequenceVersion": "[parameters('sequenceVersion')]",
           "EncryptionOperation": "[variables('encryptionOperation')]"
           
        
