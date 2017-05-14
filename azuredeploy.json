@@ -18,7 +18,7 @@
     },
     "secret": {
       "type": "String",
-      "defaultValue": "Cloud2016",
+      "defaultValue": "",
       "metadata": {
         "description": "The name of the server."
       }
