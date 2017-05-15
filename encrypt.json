@@ -65,7 +65,7 @@
     "encryptionOperation": "EnableEncryption",
     "keyEncryptionAlgorithm": "RSA-OAEP",
     "updateVmTemplateName": "UpdateVmTemplate",
-    "updateVmUrl": "https://github.com/Azure/azure-quickstart-templates/blob/master/201-encrypt-running-linux-vm/updatevm-kek.json",
+    "updateVmUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-running-linux-vm/updatevm-kek.json",
     "keyVaultURL": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]",
     "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',parameters('keyVaultResourceGroup'),'/providers/Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
   },
