@@ -56,8 +56,8 @@
     }
   },
   "variables": {
-    "extensionName": "AzureDiskEncryption",
-    "extensionVersion": "1.1",
+    "extensionName": "AzureDiskEncryptionForLinux",
+    "extensionVersion": "0.1",
     "encryptionOperation": "EnableEncryption",
     "keyEncryptionAlgorithm": "RSA-OAEP",
     "updateVmUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-running-windows-vm/updatevm-kek.json",
@@ -72,7 +72,7 @@
       "location": "[resourceGroup().location]",
       "properties": {
         "publisher": "Microsoft.Azure.Security",
-        "type": "AzureDiskEncryption",
+        "type": "AzureDiskEncryptionForLinux",
         "typeHandlerVersion": "[variables('extensionVersion')]",
         "autoUpgradeMinorVersion": true,
         "forceUpdateTag": "[parameters('sequenceVersion')]",
